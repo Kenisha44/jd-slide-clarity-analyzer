@@ -37,7 +37,7 @@ const openai = new OpenAI({
 });
 
 const upload = multer({
-  dest: path.join(__dirname, "uploads"),
+  dest: "/tmp",
   limits: {
     fileSize: 15 * 1024 * 1024,
   },
@@ -343,6 +343,10 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.listen(3000, () => {
-  console.log("Server running on http://localhost:3000");
-});
+if (process.env.VERCEL !== "1") {
+  app.listen(3000, () => {
+    console.log("Server running on http://localhost:3000");
+  });
+}
+
+export default app;
