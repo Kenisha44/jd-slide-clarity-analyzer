@@ -304,14 +304,12 @@
   <script>
     let uploadedFileText = "";
 
-    document.getElementById("fileInput").addEventListener("change", async (event) => {
-      const file = event.target.files[0];
-      if (!file) return;
+    document.getElementById("pptxFile").addEventListener("change", async (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
 
-      const text = await file.text();
-      uploadedFileText = text;
-      document.getElementById("status").innerText = "File loaded. Ready to analyze.";
-    });
+  document.getElementById("status").innerText = "File loaded. Ready to analyze.";
+});
 
     function fillExample() {
       document.getElementById("title").value = "Q2 Marketing Performance";
@@ -326,8 +324,7 @@
     function clearForm() {
       document.getElementById("title").value = "";
       document.getElementById("bullets").value = "";
-      document.getElementById("fileInput").value = "";
-      uploadedFileText = "";
+      document.getElementById("pptxFile").value = "";
       document.getElementById("status").innerText = "";
       document.getElementById("results").innerHTML = `
         <div class="result-section">
@@ -451,7 +448,7 @@
   `;
 
       try {
-        const res = await fetch("http://localhost:3000/upload-pptx", {
+        const res = await fetch(window.location.origin + "/api/upload-pptx", {
           method: "POST",
           body: formData
         });
@@ -529,7 +526,7 @@
   `;
 
       try {
-        const res = await fetch("http://localhost:3000/analyze-pptx-slide", {
+        const res = await fetch(window.location.origin + "/api/analyze-pptx-slide", {
           method: "POST",
           body: formData
         });
