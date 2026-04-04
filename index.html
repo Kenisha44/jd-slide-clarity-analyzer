@@ -358,72 +358,72 @@
     }
 
     async function analyze() {
-      const check = document.getElementById("disclaimerCheck");
-      if (check && !check.checked) {
-        alert("Please confirm the disclaimer before proceeding.");
-        return;
-      }
-      const title = document.getElementById("title").value.trim();
-      let bullets = document.getElementById("bullets").value.trim();
-      const status = document.getElementById("status");
+  const check = document.getElementById("disclaimerCheck");
+  if (check && !check.checked) {
+    alert("Please confirm the disclaimer before proceeding.");
+    return;
+  }
 
-      if (!bullets && uploadedFileText) {
-        bullets = uploadedFileText;
-      }
+  const title = document.getElementById("title").value.trim();
+  const bullets = document.getElementById("bullets").value.trim();
+  const status = document.getElementById("status");
+  const results = document.getElementById("results");
 
-      if (!title && !bullets) {
-        status.innerText = "Please add slide content first.";
-        return;
-      }
+  if (!title && !bullets) {
+    status.innerText = "Please add slide content first.";
+    return;
+  }
 
-      status.innerText = "Analyzing...";
-      document.getElementById("results").innerHTML = `
-        <div class="result-section">
-          <h3>Working...</h3>
-          <pre>Please wait while your slide is analyzed.</pre>
-        </div>
-      `;
-
-      try {
-        const res = await fetch(window.location.origin + "/api/analyze", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ title, bullets })
-        });
-
-        let data;
-        try {
-          data = await res.json();
-        } catch (jsonErr) {
-          throw new Error("Could not parse API response as JSON.");
-        }
-
-        if (!res.ok) {
-          status.innerText = "Something went wrong.";
-          document.getElementById("results").innerHTML = `
-              <div class="result-section">
-                <h3>Error</h3>
-                <pre>${escapeHtml(data?.error || "Unknown API error")}</pre>
-           </div>
-              `;
-          return;
-        }
-
-        status.innerText = "Done.";
-        renderResults(data.result);
-      } catch (err) {
-        console.error("Analyze request failed:", err);
-        status.innerText = "Request failed.";
-        document.getElementById("results").innerHTML = `
+  status.innerText = "Analyzing...";
+  results.innerHTML = `
     <div class="result-section">
-      <h3>Error</h3>
-      <pre>${escapeHtml(err?.message || "Unknown fetch error")}</pre>
+      <h3>Working...</h3>
+      <pre>Please wait while your slide is analyzed.</pre>
     </div>
   `;
-      }
+
+  try {
+    const res = await fetch(window.location.origin + "/api/analyze", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ title, bullets })
+    });
+
+    const text = await res.text();
+    let data;
+
+    try {
+      data = JSON.parse(text);
+    } catch {
+      throw new Error("API returned non-JSON response: " + text.slice(0, 200));
     }
+
+    if (!res.ok) {
+      status.innerText = "Something went wrong.";
+      results.innerHTML = `
+        <div class="result-section">
+          <h3>Error</h3>
+          <pre>${escapeHtml(data.error || "Unknown API error")}</pre>
+        </div>
+      `;
+      return;
+    }
+
+    status.innerText = "Done.";
+    renderResults(data.result);
+  } catch (err) {
+    console.error("Analyze request failed:", err);
+    status.innerText = "Request failed.";
+    results.innerHTML = `
+      <div class="result-section">
+        <h3>Error</h3>
+        <pre>${escapeHtml(err.message || "Unknown fetch error")}</pre>
+      </div>
+    `;
+  }
+}
     async function previewDeck() {
       const check = document.getElementById("disclaimerCheck");
       if (check && !check.checked) {
