@@ -293,16 +293,19 @@
     }
 
     function fillExample() {
-      titleEl.value = "Q2 Marketing Performance";
-      bulletsEl.value = `- Revenue increased 12%
+  titleEl.value = "Q2 Marketing Performance";
+  bulletsEl.value = `- Revenue increased 12%
 - Website traffic improved
 - Email CTR rose 18%
 - Paid social outperformed target
 - Recommend increasing budget`;
-      updateCounts();
-      document.getElementById("status").innerText = "Example loaded.";
-    }
 
+  updateCounts();
+  document.getElementById("status").innerText = "Example loaded. Analyzing...";
+  document.getElementById("disclaimerCheck").checked = true;
+
+  analyze();
+}
     function clearForm() {
       titleEl.value = "";
       bulletsEl.value = "";
