@@ -232,7 +232,7 @@
     <div class="hero">
       <h1>Slide Clarity Analyzer</h1>
       <p>
-        Paste one slide’s title and bullets, or upload a simple text file.
+        Paste one slide’s title and bullets, or upload a PowerPoint deck.
         Get a clarity score, issues spotted, and a cleaner rewrite in seconds.
       </p>
     </div>
@@ -302,20 +302,8 @@
   </div>
 
   <script>
-    function requireDisclaimer() {
-      const checked = document.getElementById("disclaimerCheck").checked;
-      const status = document.getElementById("status");
-  
-      if (!checked) {
-        status.innerText = "Please confirm the disclaimer before using the tool.";
-        return false;
-      }
-  
-      return true;
-    }
-  
-    function escapeHtml(value) {
-      return String(value || "")
+    function escapeHtml(str) {
+      return String(str ?? "")
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
@@ -323,32 +311,27 @@
         .replace(/'/g, "&#39;");
     }
   
-    function renderResults(resultText) {
-      const results = document.getElementById("results");
-      const safeText = escapeHtml(resultText || "No result returned.");
+    function requireDisclaimer() {
+      const check = document.getElementById("disclaimerCheck");
+      const status = document.getElementById("status");
   
-      const scoreMatch = String(resultText || "").match(/Clarity Score:\s*([^\n]+)/i);
-      const scoreHtml = scoreMatch
-        ? `<div class="score-box">Clarity Score: ${escapeHtml(scoreMatch[1])}</div>`
-        : "";
+      if (check && !check.checked) {
+        status.innerText = "Please confirm the disclaimer before proceeding.";
+        return false;
+      }
   
-      results.innerHTML = `
-        ${scoreHtml}
-        <div class="result-section">
-          <h3>Analysis</h3>
-          <pre>${safeText}</pre>
-        </div>
-      `;
+      return true;
     }
   
     function fillExample() {
       document.getElementById("title").value = "Q2 Marketing Performance";
       document.getElementById("bullets").value =
-  `- Revenue increased 12% year over year
-  - Website traffic improved across paid and organic channels
-  - Email click-through rate rose 18%
-  - Social engagement remained strong across campaigns
-  - Team recommends increasing budget next quarter`;
+  `- Revenue increased by 12%
+  - Website traffic grew significantly
+  - Paid social performed better than expected
+  - CAC improved across two main campaigns
+  - Email marketing contributed to conversions`;
+  
       document.getElementById("status").innerText = "Example loaded.";
     }
   
@@ -356,7 +339,7 @@
       document.getElementById("title").value = "";
       document.getElementById("bullets").value = "";
       document.getElementById("pptxFile").value = "";
-      document.getElementById("slideNumber").value = "";
+      document.getElementById("slideNumber").value = "1";
       document.getElementById("status").innerText = "";
       document.getElementById("results").innerHTML = `
         <div class="result-section">
@@ -365,6 +348,25 @@
         </div>
       `;
     }
+  
+    function renderResults(text) {
+      const scoreMatch = String(text).match(/Clarity Score:\s*(.*)/i);
+      const score = scoreMatch ? scoreMatch[1].trim() : "Not found";
+  
+      document.getElementById("results").innerHTML = `
+        <div class="score-box">Clarity Score: ${escapeHtml(score)}</div>
+        <div class="result-section">
+          <h3>Full Analysis</h3>
+          <pre>${escapeHtml(text)}</pre>
+        </div>
+      `;
+    }
+  
+    document.getElementById("pptxFile").addEventListener("change", async (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+      document.getElementById("status").innerText = "File loaded. Ready to analyze.";
+    });
   
     async function analyze() {
       if (!requireDisclaimer()) return;
@@ -480,14 +482,12 @@
         }
   
         const slidesHtml = (data.slides || [])
-          .map((slide) => {
-            return `
-              <div class="result-section">
-                <h3>Slide ${slide.slideNumber}</h3>
-                <pre>${escapeHtml(slide.preview || "[No preview available]")}</pre>
-              </div>
-            `;
-          })
+          .map((slide) => `
+            <div class="result-section">
+              <h3>Slide ${slide.slideNumber}</h3>
+              <pre>${escapeHtml(slide.preview || "[No preview available]")}</pre>
+            </div>
+          `)
           .join("");
   
         status.innerText = `Preview loaded. Found ${data.slideCount || 0} slide(s).`;
@@ -499,7 +499,7 @@
         `;
       } catch (err) {
         console.error("Preview deck failed:", err);
-        status.innerText = "Request failed.";
+        status.innerText = "Deck parsing request failed.";
         results.innerHTML = `
           <div class="result-section">
             <h3>Error</h3>
