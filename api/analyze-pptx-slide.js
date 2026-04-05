@@ -102,71 +102,77 @@ async function extractSlidesFromPptx(filePath) {
 }
 
 function buildLocalAnalysis(slideText) {
-  const lines = String(slideText)
-    .split("\n")
-    .map((line) => line.trim())
-    .filter(Boolean);
-
-  let score = 8;
-  const issues = [];
-  const suggestions = [];
-
-  if (!lines.length) {
-    return `Clarity Score: 2/10
-
-Issues Found:
-- No readable text was extracted from this slide.
-
-Suggested Improvements:
-- Use a text-based slide or confirm the slide contains selectable text.
-
-Suggested Rewrite:
-Title: Add a clear takeaway title
-
-- Add 3 to 5 concise bullets`;
+    const lines = String(slideText)
+      .split("\n")
+      .map((line) => line.trim())
+      .filter(Boolean);
+  
+    if (!lines.length) {
+      return `Clarity Score: 2/10
+  
+  Plain-English summary:
+  I could not find readable text on this slide.
+  
+  What to improve:
+  - Make sure the slide contains real selectable text
+  - Add a clear title
+  - Add 3 short bullets
+  
+  Better version:
+  Title: Main takeaway
+  
+  - First key point
+  - Second key point
+  - Third key point`;
+    }
+  
+    let score = 8;
+    const problems = [];
+    const fixes = [];
+  
+    if (lines.length > 6) {
+      score -= 1;
+      problems.push("Too much text.");
+      fixes.push("Cut this down to only the most important points.");
+    }
+  
+    if (lines.some((line) => line.length > 100)) {
+      score -= 1;
+      problems.push("Some lines are too long.");
+      fixes.push("Shorten each point so it is easier to scan.");
+    }
+  
+    if (!/\d/.test(slideText)) {
+      problems.push("No numbers or proof points.");
+      fixes.push("Add a number, percentage, or result if possible.");
+    }
+  
+    if (!problems.length) {
+      problems.push("Pretty clear overall.");
+      fixes.push("Tighten the wording and make the title more direct.");
+    }
+  
+    if (score < 1) score = 1;
+  
+    const title = lines[0] || "Main takeaway";
+    const body =
+      lines.slice(1, 5).map((line) => `- ${line}`).join("\n") ||
+      "- Add concise supporting points";
+  
+    return `Clarity Score: ${score}/10
+  
+  Plain-English summary:
+  ${problems.map((item) => `- ${item}`).join("\n")}
+  
+  How to improve it:
+  ${fixes.map((item) => `- ${item}`).join("\n")}
+  
+  Better version:
+  Title: ${title}
+  
+  ${body}`;
   }
-
-  if (lines.length > 6) {
-    score -= 1;
-    issues.push("This slide may contain too much text.");
-    suggestions.push("Reduce to the most important points.");
-  }
-
-  if (lines.some((line) => line.length > 100)) {
-    score -= 1;
-    issues.push("Some lines are too long for quick scanning.");
-    suggestions.push("Shorten longer statements.");
-  }
-
-  if (!/\d/.test(slideText)) {
-    issues.push("The slide may need a specific metric or proof point.");
-    suggestions.push("Add at least one number, percentage, or measurable result.");
-  }
-
-  if (!issues.length) {
-    issues.push("The slide is fairly clear, but can be sharpened.");
-    suggestions.push("Use a more insight-led title and tighten wording.");
-  }
-
-  if (score < 1) score = 1;
-
-  const title = lines[0] || "Key Takeaway";
-  const body = lines.slice(1, 6).map((line) => `- ${line}`).join("\n") || "- Add concise supporting points";
-
-  return `Clarity Score: ${score}/10
-
-Issues Found:
-${issues.map((item) => `- ${item}`).join("\n")}
-
-Suggested Improvements:
-${suggestions.map((item) => `- ${item}`).join("\n")}
-
-Suggested Rewrite:
-Title: ${title}
-
-${body}`;
-}
-
+  
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
@@ -176,7 +182,6 @@ export default async function handler(req, res) {
 
   try {
     const { fields, files } = await parseForm(req);
-
     const deckFile = Array.isArray(files.deck) ? files.deck[0] : files.deck;
 
     if (!deckFile) {

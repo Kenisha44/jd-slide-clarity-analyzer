@@ -1,7 +1,7 @@
-import multer from "multer";
 import fs from "fs/promises";
 import JSZip from "jszip";
 import { XMLParser } from "fast-xml-parser";
+import formidable from "formidable";
 
 export const config = {
   api: {
@@ -9,30 +9,17 @@ export const config = {
   }
 };
 
-const upload = multer({
-  dest: "/tmp",
-  limits: {
-    fileSize: 15 * 1024 * 1024
-  },
-  fileFilter: (req, file, cb) => {
-    const isPptx =
-      file.mimetype ===
-        "application/vnd.openxmlformats-officedocument.presentationml.presentation" ||
-      file.originalname.toLowerCase().endsWith(".pptx");
+function parseForm(req) {
+  const form = formidable({
+    multiples: false,
+    keepExtensions: true,
+    maxFileSize: 15 * 1024 * 1024
+  });
 
-    if (!isPptx) {
-      return cb(new Error("Only .pptx files are allowed."));
-    }
-
-    cb(null, true);
-  }
-});
-
-function runMiddleware(req, res, fn) {
   return new Promise((resolve, reject) => {
-    fn(req, res, (result) => {
-      if (result instanceof Error) return reject(result);
-      return resolve(result);
+    form.parse(req, (err, fields, files) => {
+      if (err) return reject(err);
+      resolve({ fields, files });
     });
   });
 }
@@ -40,77 +27,73 @@ function runMiddleware(req, res, fn) {
 function cleanExtractedText(text) {
   return String(text || "")
     .replace(/\r/g, "\n")
-    .replace(/[ \t]+\n/g, "\n")
     .replace(/\n{3,}/g, "\n\n")
+    .replace(/[ \t]+/g, " ")
     .trim();
 }
 
-function collectText(node, parts = []) {
-  if (!node) return parts;
+function extractTextFromNode(node, acc = []) {
+  if (!node) return acc;
 
   if (typeof node === "string") {
-    const text = node.trim();
-    if (
-      text.length > 1 &&
-      !text.startsWith("http") &&
-      !text.includes("schemas.microsoft") &&
-      !text.match(/^\{.*\}$/) &&
-      !text.match(/^[0-9.]+$/) &&
-      !["UTF-8", "en-US", "body", "tx1", "ppt"].includes(text)
-    ) {
-      parts.push(text);
-    }
-    return parts;
+    const trimmed = node.trim();
+    if (trimmed) acc.push(trimmed);
+    return acc;
   }
 
   if (Array.isArray(node)) {
-    node.forEach((item) => collectText(item, parts));
-    return parts;
+    for (const item of node) extractTextFromNode(item, acc);
+    return acc;
   }
 
   if (typeof node === "object") {
     for (const [key, value] of Object.entries(node)) {
       if (key === "a:t" || key.endsWith(":t")) {
-        collectText(value, parts);
+        if (Array.isArray(value)) {
+          value.forEach((v) => {
+            const txt = String(v || "").trim();
+            if (txt) acc.push(txt);
+          });
+        } else {
+          const txt = String(value || "").trim();
+          if (txt) acc.push(txt);
+        }
       } else {
-        collectText(value, parts);
+        extractTextFromNode(value, acc);
       }
     }
   }
 
-  return parts;
+  return acc;
 }
 
 async function extractSlidesFromPptx(filePath) {
   const buffer = await fs.readFile(filePath);
   const zip = await JSZip.loadAsync(buffer);
-
   const parser = new XMLParser({
     ignoreAttributes: false,
-    attributeNamePrefix: "@_",
-    trimValues: true
+    attributeNamePrefix: "@_"
   });
 
-  const slideFiles = Object.keys(zip.files)
+  const slideEntries = Object.keys(zip.files)
     .filter((name) => /^ppt\/slides\/slide\d+\.xml$/.test(name))
     .sort((a, b) => {
-      const aNum = Number(a.match(/slide(\d+)\.xml$/)?.[1] || 0);
-      const bNum = Number(b.match(/slide(\d+)\.xml$/)?.[1] || 0);
+      const aNum = Number(a.match(/slide(\d+)\.xml/)?.[1] || 0);
+      const bNum = Number(b.match(/slide(\d+)\.xml/)?.[1] || 0);
       return aNum - bNum;
     });
 
   const slides = [];
 
-  for (let i = 0; i < slideFiles.length; i++) {
-    const slidePath = slideFiles[i];
-    const xml = await zip.files[slidePath].async("string");
+  for (let i = 0; i < slideEntries.length; i++) {
+    const xml = await zip.files[slideEntries[i]].async("string");
     const parsed = parser.parse(xml);
-    const texts = collectText(parsed);
-    const joined = cleanExtractedText([...new Set(texts)].join("\n"));
+    const textRuns = extractTextFromNode(parsed);
+    const joined = cleanExtractedText(textRuns.join("\n"));
 
     slides.push({
       slideNumber: i + 1,
-      text: joined || "[No extractable text found on this slide]"
+      preview: joined || "[No text found on this slide]"
     });
   }
 
@@ -122,36 +105,49 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  let filePath = null;
+  let uploadedFilePath = null;
 
   try {
-    await runMiddleware(req, res, upload.single("deck"));
+    const { files } = await parseForm(req);
+    const deckFile = Array.isArray(files.deck) ? files.deck[0] : files.deck;
 
-    if (!req.file) {
-      return res.status(400).json({ error: "No file uploaded." });
+    if (!deckFile) {
+      return res.status(400).json({
+        error: "No PPTX file uploaded. Use field name 'deck'."
+      });
     }
 
-    filePath = req.file.path;
+    const filepath = deckFile.filepath;
+    const originalName = deckFile.originalFilename || "uploaded.pptx";
+    const mimetype = deckFile.mimetype || "";
+    uploadedFilePath = filepath;
 
-    const slides = await extractSlidesFromPptx(filePath);
+    const looksLikePptx =
+      mimetype === "application/vnd.openxmlformats-officedocument.presentationml.presentation" ||
+      originalName.toLowerCase().endsWith(".pptx");
+
+    if (!looksLikePptx) {
+      return res.status(400).json({
+        error: "Only .pptx files are allowed."
+      });
+    }
+
+    const slides = await extractSlidesFromPptx(filepath);
 
     return res.status(200).json({
-      fileName: req.file.originalname,
+      fileName: originalName,
       slideCount: slides.length,
-      slides: slides.map((slide) => ({
-        slideNumber: slide.slideNumber,
-        preview: slide.text.slice(0, 400)
-      }))
+      slides
     });
-  } catch (err) {
-    console.error("UPLOAD PPTX API ERROR:", err);
+  } catch (error) {
+    console.error("upload-pptx.js error:", error);
     return res.status(500).json({
-      error: err?.message || "Failed to parse PPTX."
+      error: error.message || "Failed to preview PPTX."
     });
   } finally {
-    if (filePath) {
+    if (uploadedFilePath) {
       try {
-        await fs.unlink(filePath);
+        await fs.unlink(uploadedFilePath);
       } catch {}
     }
   }

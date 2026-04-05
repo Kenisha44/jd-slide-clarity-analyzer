@@ -232,8 +232,10 @@
     <div class="hero">
       <h1>Slide Clarity Analyzer</h1>
       <p>
-        Paste one slide’s title and bullets, or upload a PowerPoint deck.
-        Get a clarity score, issues spotted, and a cleaner rewrite in seconds.
+        <p>
+          Paste one slide’s title and bullets, or upload a PowerPoint deck.
+          Get a clarity score, issues spotted, and a cleaner rewrite in seconds.
+        </p>
       </p>
     </div>
 
@@ -271,11 +273,11 @@
           I understand not to upload confidential information.
         </label>
         <div class="button-row">
-          <button class="primary" onclick="analyze()">Analyze Typed Slide</button>
-          <button class="secondary" onclick="previewDeck()">Preview Deck Slides</button>
-          <button class="secondary" onclick="analyzeUploadedSlide()">Analyze PPTX Slide</button>
-          <button class="secondary" onclick="fillExample()">Use Example</button>
-          <button class="secondary" onclick="clearForm()">Clear</button>
+          <button type="button" class="primary" onclick="analyze()">Analyze Typed Slide</button>
+          <button type="button" class="secondary" onclick="previewDeck()">Preview Deck Slides</button>
+          <button type="button" class="secondary" onclick="analyzeUploadedSlide()">Analyze PPTX Slide</button>
+          <button type="button" class="secondary" onclick="fillExample()">Use Example</button>
+          <button type="button" class="secondary" onclick="clearForm()">Clear</button>
         </div>
 
         <div class="status" id="status"></div>
@@ -324,17 +326,16 @@
     }
   
     function fillExample() {
-      document.getElementById("title").value = "Q2 Marketing Performance";
-      document.getElementById("bullets").value =
-  `- Revenue increased by 12%
-  - Website traffic grew significantly
-  - Paid social performed better than expected
-  - CAC improved across two main campaigns
-  - Email marketing contributed to conversions`;
-  
-      document.getElementById("status").innerText = "Example loaded.";
-    }
-  
+  document.getElementById("title").value = "Q2 Marketing Performance";
+  document.getElementById("bullets").value =
+`- Revenue increased 12%
+- Website traffic improved
+- Email click-through rate rose 18%
+- Paid social outperformed target
+- Team recommends increasing budget next quarter`;
+
+  document.getElementById("status").innerText = "Example loaded.";
+}
     function clearForm() {
       document.getElementById("title").value = "";
       document.getElementById("bullets").value = "";
