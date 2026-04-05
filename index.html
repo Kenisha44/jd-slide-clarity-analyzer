@@ -367,11 +367,11 @@
 - Paid social outperformed target
 - Team recommends increasing budget next quarter`;
 
-  updateCounts(); // 🔥 keeps counters accurate
+  document.getElementById("disclaimerCheck").checked = true;
+  updateCounts();
 
   statusEl.innerText = "Example loaded.";
 
-  // 🔥 optional but recommended: prepare for analyze
   pendingAnalysis = {
     title: titleEl.value.trim(),
     bullets: bulletsEl.value.trim()
