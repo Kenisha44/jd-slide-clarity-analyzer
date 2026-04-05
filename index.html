@@ -68,6 +68,7 @@
     }
 
     input[type="text"],
+    input[type="email"],
     textarea {
       width: 100%;
       border: 1px solid #cbd5e1;
@@ -171,6 +172,41 @@
       border-radius: 14px;
     }
 
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.55);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 999;
+    }
+
+    .modal {
+      width: 100%;
+      max-width: 420px;
+      background: #ffffff;
+      border-radius: 22px;
+      padding: 24px;
+      box-shadow: 0 20px 50px rgba(15, 23, 42, 0.2);
+    }
+
+    .modal p {
+      color: #64748b;
+      line-height: 1.5;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .modal-actions button {
+      flex: 1;
+    }
+
     @media (max-width: 860px) {
       .grid {
         grid-template-columns: 1fr;
@@ -193,7 +229,7 @@
           id="title"
           type="text"
           maxlength="80"
-          placeholder="Example: Q2 Marketing Performance"
+          placeholder="Example: Campaign Performance"
         />
         <div class="counter"><span id="titleCount">0</span> / 80</div>
 
@@ -243,11 +279,37 @@
     </div>
   </div>
 
+  <div id="emailGate" class="modal-backdrop">
+    <div class="modal">
+      <h3>Get Your Slide Analysis</h3>
+      <p>Enter your email to unlock your results.</p>
+
+      <input
+        id="userEmail"
+        type="email"
+        placeholder="you@email.com"
+        maxlength="120"
+      />
+
+      <div class="modal-actions">
+        <button type="button" class="secondary" onclick="closeEmailGate()">Cancel</button>
+        <button type="button" class="primary" onclick="submitEmail()">Show My Results</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const titleEl = document.getElementById("title");
     const bulletsEl = document.getElementById("bullets");
     const titleCountEl = document.getElementById("titleCount");
     const bulletsCountEl = document.getElementById("bulletsCount");
+    const statusEl = document.getElementById("status");
+    const resultsEl = document.getElementById("results");
+    const emailGateEl = document.getElementById("emailGate");
+    const userEmailEl = document.getElementById("userEmail");
+
+    let pendingAnalysis = null;
+    let autoRunAfterEmail = false;
 
     function updateCounts() {
       titleCountEl.innerText = titleEl.value.length;
@@ -258,14 +320,10 @@
     bulletsEl.addEventListener("input", updateCounts);
 
     function requireDisclaimer() {
-      const checked = document.getElementById("disclaimerCheck").checked;
-      const status = document.getElementById("status");
-
-      if (!checked) {
-        status.innerText = "Please confirm the disclaimer before using the tool.";
+      if (!document.getElementById("disclaimerCheck").checked) {
+        statusEl.innerText = "Please confirm the disclaimer before using the tool.";
         return false;
       }
-
       return true;
     }
 
@@ -279,11 +337,10 @@
     }
 
     function renderResults(resultText) {
-      const results = document.getElementById("results");
       const safeText = escapeHtml(resultText || "No result returned.");
       const scoreMatch = String(resultText || "").match(/Clarity Score:\s*([^\n]+)/i);
 
-      results.innerHTML = `
+      resultsEl.innerHTML = `
         ${scoreMatch ? `<div class="score-box">Clarity Score: ${escapeHtml(scoreMatch[1])}</div>` : ""}
         <div class="result-section">
           <h3>Analysis</h3>
@@ -292,26 +349,33 @@
       `;
     }
 
+    function openEmailGate() {
+      emailGateEl.style.display = "flex";
+      userEmailEl.focus();
+    }
+
+    function closeEmailGate() {
+      emailGateEl.style.display = "none";
+      autoRunAfterEmail = false;
+    }
+
     function fillExample() {
-  titleEl.value = "Q2 Marketing Performance";
-  bulletsEl.value = `- Revenue increased 12%
-- Website traffic improved
-- Email CTR rose 18%
-- Paid social outperformed target
-- Recommend increasing budget`;
+      titleEl.value = "Campaign Performance Slide";
+      bulletsEl.value = `This campaign shows overall strong performance across multiple channels, with revenue increasing steadily over time. While ad spend has remained relatively stable, improvements in CTR and conversion rate have contributed to higher overall returns. Continued optimization across channels is recommended to sustain growth.`;
+      document.getElementById("disclaimerCheck").checked = true;
+      updateCounts();
+      statusEl.innerText = "Example loaded.";
+    }
 
-  updateCounts();
-  document.getElementById("status").innerText = "Example loaded. Analyzing...";
-  document.getElementById("disclaimerCheck").checked = true;
-
-  analyze();
-}
     function clearForm() {
       titleEl.value = "";
       bulletsEl.value = "";
+      userEmailEl.value = "";
+      pendingAnalysis = null;
+      autoRunAfterEmail = false;
       updateCounts();
-      document.getElementById("status").innerText = "";
-      document.getElementById("results").innerHTML = `
+      statusEl.innerText = "";
+      resultsEl.innerHTML = `
         <div class="result-section">
           <h3>Waiting for analysis</h3>
           <pre>Your clarity score, issues, and improved rewrite will appear here.</pre>
@@ -319,31 +383,68 @@
       `;
     }
 
-    async function analyze() {
-      if (!requireDisclaimer()) return;
-
+    function validateInputs() {
       const title = titleEl.value.trim();
       const bullets = bulletsEl.value.trim();
-      const status = document.getElementById("status");
-      const results = document.getElementById("results");
 
       if (!title && !bullets) {
-        status.innerText = "Please add slide content first.";
-        return;
+        statusEl.innerText = "Please add slide content first.";
+        return null;
       }
 
       if (title.length > 80) {
-        status.innerText = "Keep the title under 80 characters.";
-        return;
+        statusEl.innerText = "Keep the title under 80 characters.";
+        return null;
       }
 
       if (bullets.length > 400) {
-        status.innerText = "Keep the slide text under 400 characters.";
+        statusEl.innerText = "Keep the slide text under 400 characters.";
+        return null;
+      }
+
+      return { title, bullets };
+    }
+
+    async function analyze() {
+      if (!requireDisclaimer()) return;
+
+      const payload = validateInputs();
+      if (!payload) return;
+
+      pendingAnalysis = payload;
+
+      if (!userEmailEl.value.trim()) {
+        autoRunAfterEmail = true;
+        openEmailGate();
         return;
       }
 
-      status.innerText = "Analyzing...";
-      results.innerHTML = `
+      await runAnalysis(userEmailEl.value.trim());
+    }
+
+    async function submitEmail() {
+      const email = userEmailEl.value.trim();
+
+      if (!email || !email.includes("@")) {
+        statusEl.innerText = "Please enter a valid email.";
+        return;
+      }
+
+      emailGateEl.style.display = "none";
+
+      if (autoRunAfterEmail && pendingAnalysis) {
+        await runAnalysis(email);
+      }
+    }
+
+    async function runAnalysis(email) {
+      if (!pendingAnalysis) {
+        statusEl.innerText = "Please add slide content first.";
+        return;
+      }
+
+      statusEl.innerText = "Analyzing...";
+      resultsEl.innerHTML = `
         <div class="result-section">
           <h3>Working...</h3>
           <pre>Please wait while your slide is analyzed.</pre>
@@ -356,7 +457,10 @@
           headers: {
             "Content-Type": "application/json"
           },
-          body: JSON.stringify({ title, bullets })
+          body: JSON.stringify({
+            ...pendingAnalysis,
+            email
+          })
         });
 
         const raw = await res.text();
@@ -369,8 +473,8 @@
         }
 
         if (!res.ok) {
-          status.innerText = "Something went wrong.";
-          results.innerHTML = `
+          statusEl.innerText = "Something went wrong.";
+          resultsEl.innerHTML = `
             <div class="result-section">
               <h3>Error</h3>
               <pre>${escapeHtml(data.error || "Unknown API error")}</pre>
@@ -379,12 +483,13 @@
           return;
         }
 
-        status.innerText = "Done.";
+        statusEl.innerText = "Done.";
         renderResults(data.result);
+        autoRunAfterEmail = false;
       } catch (err) {
         console.error(err);
-        status.innerText = "Request failed.";
-        results.innerHTML = `
+        statusEl.innerText = "Request failed.";
+        resultsEl.innerHTML = `
           <div class="result-section">
             <h3>Error</h3>
             <pre>${escapeHtml(err.message || "Unknown error")}</pre>

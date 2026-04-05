@@ -1,17 +1,28 @@
+import { Resend } from "resend";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
   try {
-    const { title = "", bullets = "" } = req.body || {};
+    const { title = "", bullets = "", email = "" } = req.body || {};
 
     const cleanTitle = String(title).trim();
     const cleanBullets = String(bullets).trim();
+    const cleanEmail = String(email).trim();
 
     if (!cleanTitle && !cleanBullets) {
       return res.status(400).json({
         error: "Please provide a slide title or slide text."
+      });
+    }
+
+    if (!cleanEmail || !cleanEmail.includes("@")) {
+      return res.status(400).json({
+        error: "A valid email is required."
       });
     }
 
@@ -28,6 +39,26 @@ export default async function handler(req, res) {
     }
 
     const result = buildAnalysis(cleanTitle, cleanBullets);
+
+    try {
+      await resend.emails.send({
+        from: "Slide Tool <onboarding@resend.dev>",
+        to: "contact@johkendesign.com",
+        subject: "New Slide Analysis Lead",
+        html: `
+          <h2>New Slide Analysis Lead</h2>
+          <p><strong>Email:</strong> ${escapeHtml(cleanEmail)}</p>
+          <p><strong>Title:</strong> ${escapeHtml(cleanTitle || "(No title)")}</p>
+          <p><strong>Slide Text:</strong></p>
+          <pre>${escapeHtml(cleanBullets || "(No slide text)")}</pre>
+          <p><strong>Analysis:</strong></p>
+          <pre>${escapeHtml(result)}</pre>
+        `
+      });
+    } catch (emailError) {
+      console.error("Resend email error:", emailError);
+    }
+
     return res.status(200).json({ result });
   } catch (error) {
     console.error("analyze.js error:", error);
@@ -100,11 +131,10 @@ function rewriteTitle(title, lines) {
   const cleanTitle = cleanLine(title);
 
   if (cleanTitle) {
-    if (/performance/i.test(cleanTitle)) return "Performance Improved Across Key Channels";
-    if (/marketing/i.test(cleanTitle)) return "Marketing Results Improved Across Key Channels";
-    if (/sales/i.test(cleanTitle)) return "Sales Performance Increased This Period";
-    if (/growth/i.test(cleanTitle)) return "Growth Accelerated Across Core Metrics";
-    return cleanTitle;
+    return cleanTitle
+      .replace(/slide/gi, "")
+      .replace(/\s+/g, " ")
+      .trim() || "Performance Improved Across Key Channels";
   }
 
   if (lines.some((line) => /\brevenue\b/i.test(line))) {
@@ -115,7 +145,7 @@ function rewriteTitle(title, lines) {
     return "Key Marketing Metrics Improved";
   }
 
-  return "Main takeaway";
+  return "Performance Improved Across Key Channels";
 }
 
 function rewriteBullets(lines) {
@@ -125,10 +155,7 @@ function rewriteBullets(lines) {
 - Keep each point easy to scan`;
   }
 
-  // 🔥 Convert long paragraph into punchy bullets
   if (lines.length === 1) {
-    const text = lines[0];
-
     return [
       "- Strong performance across key channels",
       "- Revenue trending upward over time",
@@ -162,4 +189,13 @@ function tightenBullet(line) {
 
 function cleanLine(text) {
   return String(text || "").replace(/\s+/g, " ").trim();
+}
+
+function escapeHtml(value) {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }
