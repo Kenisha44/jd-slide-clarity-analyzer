@@ -43,7 +43,7 @@ export default async function handler(req, res) {
     try {
       await resend.emails.send({
         from: "Slide Tool <onboarding@resend.dev>",
-        to: "contact@johkendesign.com",
+        to: "kj@johkendesign.com",
         subject: "New Slide Analysis Lead",
         html: `
           <h2>New Slide Analysis Lead</h2>
