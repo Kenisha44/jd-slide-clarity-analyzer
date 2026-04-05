@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -10,281 +9,222 @@
       box-sizing: border-box;
     }
 
-    :root {
-      --jd-deep-teal: #0E8F95;
-      --jd-bright-teal: #18B7B8;
-      --jd-peach: #F7965A;
-      --jd-orange: #FF5A14;
-      --jd-ink: #1F2937;
-      --jd-bg: #F5F7FB;
-    }
-
     body {
       margin: 0;
-      font-family: Inter, Arial, sans-serif;
-      background: var(--jd-bg);
-      color: var(--jd-ink);
+      font-family: Arial, sans-serif;
+      background: #f3f4f6;
+      color: #0f172a;
     }
 
-    .container {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 40px 20px 80px;
-    }
-
-    .hero {
-      text-align: center;
-      margin-bottom: 32px;
-    }
-
-    .hero h1 {
-      font-size: 2.5rem;
-      margin-bottom: 12px;
-      color: var(--jd-deep-teal);
-    }
-
-    .hero p {
-      max-width: 700px;
-      margin: 0 auto;
-      color: #4b5563;
-      font-size: 1.05rem;
-      line-height: 1.6;
+    .wrap {
+      max-width: 980px;
+      margin: 40px auto;
+      padding: 0 20px;
     }
 
     .grid {
       display: grid;
       grid-template-columns: 1.1fr 0.9fr;
       gap: 24px;
-      align-items: start;
     }
 
     .card {
       background: #ffffff;
-      border-radius: 20px;
-      padding: 24px;
-      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: 0 8px 30px rgba(15, 23, 42, 0.06);
     }
 
-    .card h2 {
+    h1, h2, h3, p {
       margin-top: 0;
-      margin-bottom: 18px;
-      font-size: 1.25rem;
     }
 
-    .label {
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      font-size: 1.9rem;
+      margin-bottom: 14px;
+    }
+
+    h3 {
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+    }
+
+    p.lead {
+      color: #475569;
+      line-height: 1.5;
+      margin-bottom: 22px;
+    }
+
+    label {
       display: block;
-      font-weight: 600;
+      font-weight: 700;
       margin-bottom: 8px;
-      margin-top: 16px;
+      margin-top: 18px;
     }
 
     input[type="text"],
-    textarea,
-    input[type="file"] {
+    textarea {
       width: 100%;
-      border: 1px solid #d1d5db;
-      border-radius: 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 16px;
       padding: 14px 16px;
       font-size: 1rem;
-      outline: none;
       background: #fff;
     }
 
     textarea {
       min-height: 180px;
       resize: vertical;
-      line-height: 1.5;
     }
 
-    .help {
-      font-size: 0.9rem;
-      color: #6b7280;
+    .hint,
+    .counter,
+    .status {
+      color: #64748b;
+      font-size: 0.95rem;
       margin-top: 8px;
+    }
+
+    .checkbox-row {
+      margin-top: 18px;
+      margin-bottom: 20px;
+      font-size: 0.95rem;
     }
 
     .button-row {
       display: flex;
-      gap: 12px;
       flex-wrap: wrap;
-      margin-top: 20px;
+      gap: 12px;
+      margin-top: 14px;
     }
 
     button {
       border: none;
-      border-radius: 14px;
+      border-radius: 16px;
       padding: 14px 18px;
       font-size: 1rem;
       font-weight: 700;
       cursor: pointer;
-      transition: 0.2s ease;
     }
 
     .primary {
-      background: linear-gradient(135deg, var(--jd-deep-teal), var(--jd-bright-teal));
+      background: #16a4b6;
       color: white;
-    }
-
-    .primary:hover {
-      transform: translateY(-1px);
-      opacity: 0.95;
     }
 
     .secondary {
-      background: #e8f7f7;
-      color: var(--jd-deep-teal);
-    }
-
-    .secondary:hover {
-      transform: translateY(-1px);
-      background: #d7f0f0;
-    }
-
-    .status {
-      margin-top: 16px;
-      font-size: 0.95rem;
-      color: #4b5563;
-      min-height: 22px;
+      background: #e6f4f6;
+      color: #0b8ea0;
     }
 
     .score-box {
-      display: inline-block;
-      padding: 10px 14px;
-      border-radius: 12px;
-      background: #fff1e8;
-      color: var(--jd-orange);
-      font-weight: 700;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 18px;
+      padding: 16px;
       margin-bottom: 16px;
-      border: 1px solid #ffd2bb;
+      font-weight: 700;
     }
 
     .result-section {
-      margin-top: 18px;
-      padding: 18px;
-      border-radius: 16px;
-      background: #f9fafb;
-      border: 1px solid #e5e7eb;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 18px;
+      padding: 16px;
+      margin-bottom: 16px;
     }
 
-    .result-section h3 {
-      margin: 0 0 10px;
-      font-size: 1rem;
-    }
-
-    .result-section pre {
+    pre {
       white-space: pre-wrap;
       word-wrap: break-word;
-      margin: 0;
       font-family: inherit;
-      line-height: 1.6;
-      color: #111827;
-    }
-
-    .upload-box {
-      border: 2px dashed var(--jd-bright-teal);
-      background: #f8ffff;
-      border-radius: 16px;
-      padding: 16px;
-      margin-top: 16px;
+      margin: 0;
+      line-height: 1.55;
     }
 
     .cta {
-      margin-top: 24px;
-      padding: 20px;
-      border-radius: 18px;
-      background: linear-gradient(135deg, var(--jd-deep-teal), var(--jd-orange));
+      margin-top: 18px;
+      border-radius: 22px;
+      padding: 22px;
       color: white;
-    }
-
-    .cta h3 {
-      margin: 0 0 10px;
+      background: linear-gradient(135deg, #2a8f94, #ff5a14);
     }
 
     .cta p {
-      margin: 0 0 14px;
-      color: rgba(255, 255, 255, 0.9);
+      opacity: 0.95;
       line-height: 1.5;
     }
 
     .cta a {
       display: inline-block;
-      text-decoration: none;
+      margin-top: 8px;
       background: white;
-      color: var(--jd-deep-teal);
-      padding: 12px 16px;
-      border-radius: 12px;
+      color: #0b8ea0;
+      text-decoration: none;
       font-weight: 700;
+      padding: 12px 18px;
+      border-radius: 14px;
     }
 
-    @media (max-width: 900px) {
+    @media (max-width: 860px) {
       .grid {
         grid-template-columns: 1fr;
-      }
-
-      .hero h1 {
-        font-size: 2rem;
       }
     }
   </style>
 </head>
-
 <body>
-  <div class="container">
-    <div class="hero">
-      <h1>Slide Clarity Analyzer</h1>
-      <p>
-        <p>
-          Paste one slide’s title and bullets, or upload a PowerPoint deck.
-          Get a clarity score, issues spotted, and a cleaner rewrite in seconds.
-        </p>
-      </p>
-    </div>
-
+  <div class="wrap">
     <div class="grid">
-      <div class="card">
-        <h2>Analyze Your Slide</h2>
-
-        <label class="label" for="title">Slide Title</label>
-        <input id="title" type="text" placeholder="Example: Q2 Marketing Performance" />
-
-        <label class="label" for="bullets">Slide Bullets / Slide Text</label>
-        <textarea id="bullets"
-          placeholder="Paste your bullets here...&#10;&#10;Example:&#10;- Revenue increased 12%&#10;- Website traffic improved&#10;- Email CTR rose 18%"></textarea>
-        <div class="help">Tip: paste one messy slide at a time for the best results.</div>
-
-        <div class="upload-box">
-          <label class="label" for="pptxFile">Upload a PowerPoint deck</label>
-          <input id="pptxFile" type="file" accept=".pptx" />
-          <div class="help">Upload a .pptx and preview extracted slide text.</div>
-          <p style="font-size: 12px; color: #6b7280; margin-top: 8px;">
-            Files are processed to generate results and are not stored after processing.
-          </p>
-
-          <p style="font-size: 12px; color: #6b7280;">
-            Please do not upload confidential, sensitive, or regulated information.
-          </p>
-          <label class="label" for="slideNumber">Slide number to analyze</label>
-          <input id="slideNumber" type="text" placeholder="1" />
-        </div>
-        <p style="font-size: 12px; color: #9ca3af; margin-top: 10px;">
-          By using this tool, you acknowledge that results are AI-generated and for informational purposes only.
+      <section class="card">
+        <h1>Fix Your Slide in Seconds</h1>
+        <p class="lead">
+          Paste one slide’s title and text. Get a clarity score, what’s weakening the slide,
+          and a cleaner rewrite in seconds.
         </p>
-        <label style="font-size: 12px; display: block; margin-top: 10px;">
-          <input type="checkbox" id="disclaimerCheck" />
-          I understand not to upload confidential information.
-        </label>
+
+        <label for="title">Slide Title</label>
+        <input
+          id="title"
+          type="text"
+          maxlength="80"
+          placeholder="Example: Q2 Marketing Performance"
+        />
+        <div class="counter"><span id="titleCount">0</span> / 80</div>
+
+        <label for="bullets">Slide Bullets / Slide Text</label>
+        <textarea
+          id="bullets"
+          maxlength="400"
+          placeholder="Paste your slide text here..."
+        ></textarea>
+        <div class="counter"><span id="bulletsCount">0</span> / 400</div>
+        <div class="hint">Tip: keep it short. One messy slide at a time works best.</div>
+
+        <div class="checkbox-row">
+          <label style="font-weight: 400; margin: 0;">
+            <input id="disclaimerCheck" type="checkbox" />
+            I understand not to paste confidential information.
+          </label>
+        </div>
+
         <div class="button-row">
-          <button type="button" class="primary" onclick="analyze()">Analyze Typed Slide</button>
-          <button type="button" class="secondary" onclick="previewDeck()">Preview Deck Slides</button>
-          <button type="button" class="secondary" onclick="analyzeUploadedSlide()">Analyze PPTX Slide</button>
+          <button type="button" class="primary" onclick="analyze()">Analyze Slide</button>
           <button type="button" class="secondary" onclick="fillExample()">Use Example</button>
           <button type="button" class="secondary" onclick="clearForm()">Clear</button>
         </div>
 
-        <div class="status" id="status"></div>
-      </div>
+        <div id="status" class="status"></div>
+      </section>
 
-      <div class="card">
+      <aside class="card">
         <h2>Your Results</h2>
+
         <div id="results">
           <div class="result-section">
             <h3>Waiting for analysis</h3>
@@ -297,50 +237,76 @@
           <p>
             I offer free slide audits and presentation cleanup for founders, consultants, and teams.
           </p>
-          <a href="mailto:kj@johkendesign.com?subject=Free%20Slide%20Audit">Get Free Slide Audit</a>
+          <a href="mailto:contact@johkendesign.com?subject=Free%20Slide%20Audit">Get Free Slide Audit</a>
         </div>
-      </div>
+      </aside>
     </div>
   </div>
 
   <script>
-    function escapeHtml(str) {
-      return String(str ?? "")
+    const titleEl = document.getElementById("title");
+    const bulletsEl = document.getElementById("bullets");
+    const titleCountEl = document.getElementById("titleCount");
+    const bulletsCountEl = document.getElementById("bulletsCount");
+
+    function updateCounts() {
+      titleCountEl.innerText = titleEl.value.length;
+      bulletsCountEl.innerText = bulletsEl.value.length;
+    }
+
+    titleEl.addEventListener("input", updateCounts);
+    bulletsEl.addEventListener("input", updateCounts);
+
+    function requireDisclaimer() {
+      const checked = document.getElementById("disclaimerCheck").checked;
+      const status = document.getElementById("status");
+
+      if (!checked) {
+        status.innerText = "Please confirm the disclaimer before using the tool.";
+        return false;
+      }
+
+      return true;
+    }
+
+    function escapeHtml(value) {
+      return String(value || "")
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#39;");
     }
-  
-    function requireDisclaimer() {
-      const check = document.getElementById("disclaimerCheck");
-      const status = document.getElementById("status");
-  
-      if (check && !check.checked) {
-        status.innerText = "Please confirm the disclaimer before proceeding.";
-        return false;
-      }
-  
-      return true;
-    }
-  
-    function fillExample() {
-  document.getElementById("title").value = "Q2 Marketing Performance";
-  document.getElementById("bullets").value =
-`- Revenue increased 12%
-- Website traffic improved
-- Email click-through rate rose 18%
-- Paid social outperformed target
-- Team recommends increasing budget next quarter`;
 
-  document.getElementById("status").innerText = "Example loaded.";
-}
+    function renderResults(resultText) {
+      const results = document.getElementById("results");
+      const safeText = escapeHtml(resultText || "No result returned.");
+      const scoreMatch = String(resultText || "").match(/Clarity Score:\s*([^\n]+)/i);
+
+      results.innerHTML = `
+        ${scoreMatch ? `<div class="score-box">Clarity Score: ${escapeHtml(scoreMatch[1])}</div>` : ""}
+        <div class="result-section">
+          <h3>Analysis</h3>
+          <pre>${safeText}</pre>
+        </div>
+      `;
+    }
+
+    function fillExample() {
+      titleEl.value = "Q2 Marketing Performance";
+      bulletsEl.value = `- Revenue increased 12%
+- Website traffic improved
+- Email CTR rose 18%
+- Paid social outperformed target
+- Recommend increasing budget`;
+      updateCounts();
+      document.getElementById("status").innerText = "Example loaded.";
+    }
+
     function clearForm() {
-      document.getElementById("title").value = "";
-      document.getElementById("bullets").value = "";
-      document.getElementById("pptxFile").value = "";
-      document.getElementById("slideNumber").value = "1";
+      titleEl.value = "";
+      bulletsEl.value = "";
+      updateCounts();
       document.getElementById("status").innerText = "";
       document.getElementById("results").innerHTML = `
         <div class="result-section">
@@ -349,67 +315,58 @@
         </div>
       `;
     }
-  
-    function renderResults(text) {
-      const scoreMatch = String(text).match(/Clarity Score:\s*(.*)/i);
-      const score = scoreMatch ? scoreMatch[1].trim() : "Not found";
-  
-      document.getElementById("results").innerHTML = `
-        <div class="score-box">Clarity Score: ${escapeHtml(score)}</div>
-        <div class="result-section">
-          <h3>Full Analysis</h3>
-          <pre>${escapeHtml(text)}</pre>
-        </div>
-      `;
-    }
-  
-    document.getElementById("pptxFile").addEventListener("change", async (event) => {
-      const file = event.target.files[0];
-      if (!file) return;
-      document.getElementById("status").innerText = "File loaded. Ready to analyze.";
-    });
-  
+
     async function analyze() {
       if (!requireDisclaimer()) return;
-  
-      const title = document.getElementById("title").value.trim();
-      const bullets = document.getElementById("bullets").value.trim();
+
+      const title = titleEl.value.trim();
+      const bullets = bulletsEl.value.trim();
       const status = document.getElementById("status");
       const results = document.getElementById("results");
-  
+
       if (!title && !bullets) {
         status.innerText = "Please add slide content first.";
         return;
       }
-  
-      status.innerText = "Analyzing typed slide...";
+
+      if (title.length > 80) {
+        status.innerText = "Keep the title under 80 characters.";
+        return;
+      }
+
+      if (bullets.length > 400) {
+        status.innerText = "Keep the slide text under 400 characters.";
+        return;
+      }
+
+      status.innerText = "Analyzing...";
       results.innerHTML = `
         <div class="result-section">
           <h3>Working...</h3>
           <pre>Please wait while your slide is analyzed.</pre>
         </div>
       `;
-  
+
       try {
-        const res = await fetch(window.location.origin + "/api/analyze", {
+        const res = await fetch("/api/analyze", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
           },
           body: JSON.stringify({ title, bullets })
         });
-  
+
         const raw = await res.text();
-  
+
         let data;
         try {
           data = JSON.parse(raw);
         } catch {
           throw new Error("API returned non-JSON response: " + raw.slice(0, 200));
         }
-  
+
         if (!res.ok) {
-          status.innerText = "Typed slide analysis failed.";
+          status.innerText = "Something went wrong.";
           results.innerHTML = `
             <div class="result-section">
               <h3>Error</h3>
@@ -418,170 +375,22 @@
           `;
           return;
         }
-  
+
         status.innerText = "Done.";
         renderResults(data.result);
       } catch (err) {
-        console.error("Analyze request failed:", err);
+        console.error(err);
         status.innerText = "Request failed.";
         results.innerHTML = `
           <div class="result-section">
             <h3>Error</h3>
-            <pre>${escapeHtml(err.message || "Unknown fetch error")}</pre>
+            <pre>${escapeHtml(err.message || "Unknown error")}</pre>
           </div>
         `;
       }
     }
-  
-    async function previewDeck() {
-      if (!requireDisclaimer()) return;
-  
-      const fileInput = document.getElementById("pptxFile");
-      const status = document.getElementById("status");
-      const results = document.getElementById("results");
-  
-      if (!fileInput.files.length) {
-        status.innerText = "Please choose a .pptx file first.";
-        return;
-      }
-  
-      const formData = new FormData();
-      formData.append("deck", fileInput.files[0]);
-  
-      status.innerText = "Previewing deck slides...";
-      results.innerHTML = `
-        <div class="result-section">
-          <h3>Working...</h3>
-          <pre>Extracting slide text previews from your deck.</pre>
-        </div>
-      `;
-  
-      try {
-        const res = await fetch(window.location.origin + "/api/upload-pptx", {
-          method: "POST",
-          body: formData
-        });
-  
-        const raw = await res.text();
-  
-        let data;
-        try {
-          data = JSON.parse(raw);
-        } catch {
-          throw new Error("API returned non-JSON response: " + raw.slice(0, 200));
-        }
-  
-        if (!res.ok) {
-          status.innerText = "Deck preview failed.";
-          results.innerHTML = `
-            <div class="result-section">
-              <h3>Error</h3>
-              <pre>${escapeHtml(data.error || "Unknown API error")}</pre>
-            </div>
-          `;
-          return;
-        }
-  
-        const slidesHtml = (data.slides || [])
-          .map((slide) => `
-            <div class="result-section">
-              <h3>Slide ${slide.slideNumber}</h3>
-              <pre>${escapeHtml(slide.preview || "[No preview available]")}</pre>
-            </div>
-          `)
-          .join("");
-  
-        status.innerText = `Preview loaded. Found ${data.slideCount || 0} slide(s).`;
-        results.innerHTML = slidesHtml || `
-          <div class="result-section">
-            <h3>No slides found</h3>
-            <pre>No slide previews were returned.</pre>
-          </div>
-        `;
-      } catch (err) {
-        console.error("Preview deck failed:", err);
-        status.innerText = "Deck parsing request failed.";
-        results.innerHTML = `
-          <div class="result-section">
-            <h3>Error</h3>
-            <pre>${escapeHtml(err.message || "Unknown fetch error")}</pre>
-          </div>
-        `;
-      }
-    }
-  
-    async function analyzeUploadedSlide() {
-      if (!requireDisclaimer()) return;
-  
-      const fileInput = document.getElementById("pptxFile");
-      const slideNumber = document.getElementById("slideNumber").value.trim() || "1";
-      const status = document.getElementById("status");
-      const results = document.getElementById("results");
-  
-      if (!fileInput.files.length) {
-        status.innerText = "Please choose a .pptx file first.";
-        return;
-      }
-  
-      const formData = new FormData();
-      formData.append("deck", fileInput.files[0]);
-      formData.append("slideNumber", slideNumber);
-  
-      status.innerText = "Analyzing uploaded slide...";
-      results.innerHTML = `
-        <div class="result-section">
-          <h3>Working...</h3>
-          <pre>Parsing the deck and analyzing the selected slide.</pre>
-        </div>
-      `;
-  
-      try {
-        const res = await fetch(window.location.origin + "/api/analyze-pptx-slide", {
-          method: "POST",
-          body: formData
-        });
-  
-        const raw = await res.text();
-  
-        let data;
-        try {
-          data = JSON.parse(raw);
-        } catch {
-          throw new Error("API returned non-JSON response: " + raw.slice(0, 200));
-        }
-  
-        if (!res.ok) {
-          status.innerText = "Uploaded slide analysis failed.";
-          results.innerHTML = `
-            <div class="result-section">
-              <h3>Error</h3>
-              <pre>${escapeHtml(data.error || "Unknown API error")}</pre>
-            </div>
-          `;
-          return;
-        }
-  
-        status.innerText = `Done. Slide ${data.slideNumber} analyzed.`;
-        renderResults(
-  `Slide ${data.slideNumber}
-  
-  Original Slide Text:
-  ${data.slideText || "[No text extracted]"}
-  
-  ${data.result || "No result returned."}`
-        );
-      } catch (err) {
-        console.error("Analyze uploaded slide failed:", err);
-        status.innerText = "Request failed.";
-        results.innerHTML = `
-          <div class="result-section">
-            <h3>Error</h3>
-            <pre>${escapeHtml(err.message || "Unknown fetch error")}</pre>
-          </div>
-        `;
-      }
-    }
+
+    updateCounts();
   </script>
 </body>
-
 </html>
