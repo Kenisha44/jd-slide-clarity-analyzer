@@ -359,7 +359,7 @@
       autoRunAfterEmail = false;
     }
 
-    function fillExample() {
+    async function fillExample() {
   titleEl.value = "Q2 Marketing Performance";
   bulletsEl.value = `- Revenue increased 12%
 - Website traffic improved
@@ -370,12 +370,15 @@
   document.getElementById("disclaimerCheck").checked = true;
   updateCounts();
 
-  statusEl.innerText = "Example loaded.";
-
   pendingAnalysis = {
     title: titleEl.value.trim(),
     bullets: bulletsEl.value.trim()
   };
+
+  statusEl.innerText = "Example loaded. Running analysis...";
+  autoRunAfterEmail = false;
+
+  await runAnalysis("example@preview.local");
 }
 
     function clearForm() {
