@@ -360,12 +360,19 @@
     }
 
     function fillExample() {
-      titleEl.value = "Campaign Performance Slide";
-      bulletsEl.value = `This campaign shows overall strong performance across multiple channels, with revenue increasing steadily over time. While ad spend has remained relatively stable, improvements in CTR and conversion rate have contributed to higher overall returns. Continued optimization across channels is recommended to sustain growth.`;
-      document.getElementById("disclaimerCheck").checked = true;
-      updateCounts();
-      statusEl.innerText = "Example loaded.";
-    }
+  titleEl.value = "Campaign Performance Slide";
+  bulletsEl.value = `This campaign shows overall strong performance across multiple channels, with revenue increasing steadily over time. While ad spend has remained relatively stable, improvements in CTR and conversion rate have contributed to higher overall returns. Continued optimization across channels is recommended to sustain growth.`;
+
+  document.getElementById("disclaimerCheck").checked = true;
+  updateCounts();
+
+  pendingAnalysis = {
+    title: titleEl.value.trim(),
+    bullets: bulletsEl.value.trim()
+  };
+
+  statusEl.innerText = "Example loaded.";
+}
 
     function clearForm() {
       titleEl.value = "";
